@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Between Us — A Conversation Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600&display=swap');
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; min-height: 100%; }
+  body {
+    --bg: #16121a; --ink: #ece3d6; --muted: #8a8090;
+    --paper: #f3e9d8; --paper2: #eaddc6; --paper-ink: #2c2218;
+    font-family: 'Hanken Grotesk', -apple-system, system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 80% at 50% -10%, #2a2030 0%, rgba(42,32,48,0) 55%),
+      radial-gradient(100% 70% at 50% 120%, #241b2b 0%, rgba(36,27,43,0) 60%),
+      var(--bg);
+    padding: max(22px, env(safe-area-inset-top)) clamp(16px, 4vw, 40px) clamp(40px, 8vw, 80px);
+    display: flex; flex-direction: column; align-items: center;
+    position: relative; overflow-x: hidden;
+  }
+  body::before {
+    content:""; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.035; pointer-events: none; mix-blend-mode: overlay;
+  }
+  .wrap { width: 100%; max-width: 560px; position: relative; z-index: 1; }
+
+  .head { text-align: center; margin: clamp(10px,3vw,24px) 0 clamp(20px,4vw,34px); animation: rise .9s cubic-bezier(.2,.7,.2,1) both; }
+  .eyebrow { font-size: 11px; letter-spacing: .42em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 14px; }
+  .title { font-family: 'Fraunces', 'Iowan Old Style', Palatino, Georgia, serif; font-weight: 400; font-size: clamp(42px, 12vw, 72px); line-height: .95; letter-spacing: -0.01em; margin: 0; }
+  .title em { font-style: italic; color: #d9b277; }
+  .tag { font-family: 'Fraunces', 'Iowan Old Style', Palatino, Georgia, serif; font-style: italic; font-weight: 300; font-size: clamp(14px, 3.6vw, 17px); color: var(--muted); margin: 16px auto 0; line-height: 1.5; max-width: 38ch; }
+
+  .themes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: clamp(22px, 5vw, 34px); animation: rise .9s .1s cubic-bezier(.2,.7,.2,1) both; }
+  .chip { font-family: inherit; font-size: 12.5px; font-weight: 500; padding: 8px 14px; border-radius: 100px; cursor: pointer; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); color: var(--muted); transition: all .25s ease; white-space: nowrap; }
+  .chip:hover { color: var(--ink); border-color: rgba(255,255,255,0.22); }
+  .chip.on { color: #1a1320; background: var(--ink); border-color: var(--ink); font-weight: 600; }
+
+  .stage { perspective: 1600px; display: flex; justify-content: center; margin-bottom: 26px; animation: rise .9s .2s cubic-bezier(.2,.7,.2,1) both; }
+  .card { position: relative; width: 100%; max-width: 420px; aspect-ratio: 5/7; transform-style: preserve-3d; transition: transform .62s cubic-bezier(.45,.05,.2,1); transform: rotateY(0deg); }
+  .card.show { transform: rotateY(180deg); }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 18px; overflow: hidden; box-shadow: 0 36px 70px -28px rgba(0,0,0,0.8), 0 2px 0 rgba(255,255,255,0.04) inset; }
+  .back { background: radial-gradient(120% 90% at 50% 0%, #2c2233 0%, #1d1623 70%); border: 1px solid rgba(217,178,119,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 28px; }
+  .ring { width: clamp(80px,28vw,118px); height: clamp(80px,28vw,118px); border-radius: 50%; border: 1px solid rgba(217,178,119,0.4); display: flex; align-items: center; justify-content: center; position: relative; animation: breathe 5.5s ease-in-out infinite; }
+  .ring::before { content:""; position:absolute; inset:9px; border-radius:50%; border:1px solid rgba(217,178,119,0.22); }
+  .glyph { font-family:'Fraunces','Iowan Old Style',Palatino,Georgia,serif; font-style:italic; font-size: clamp(30px,9vw,42px); color:#d9b277; }
+  .name { font-family:'Fraunces','Iowan Old Style',Palatino,Georgia,serif; font-size:15px; letter-spacing:.34em; text-transform:uppercase; color:rgba(236,227,214,0.55); }
+  .frame { position:absolute; inset:13px; border:1px solid rgba(217,178,119,0.16); border-radius:11px; pointer-events:none; }
+
+  .front { transform: rotateY(180deg); background: linear-gradient(160deg, var(--paper) 0%, var(--paper2) 100%); color: var(--paper-ink); display: flex; flex-direction: column; padding: clamp(26px, 6vw, 40px); }
+  .front::after { content:""; position:absolute; inset:0; pointer-events:none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.6'/%3E%3C/svg%3E"); opacity:0.06; mix-blend-mode:multiply; }
+  .meta { display:flex; align-items:center; gap:10px; font-size:10.5px; letter-spacing:.26em; text-transform:uppercase; font-weight:600; }
+  .dot { width:7px; height:7px; border-radius:50%; }
+  .theme-label { color:#6b5a44; }
+  .q { flex:1; display:flex; align-items:center; font-family:'Fraunces','Iowan Old Style',Palatino,Georgia,serif; font-weight:400; font-size: clamp(21px, 5.6vw, 29px); line-height:1.28; letter-spacing:-0.005em; }
+  .num { font-family:'Fraunces','Iowan Old Style',Palatino,Georgia,serif; font-style:italic; font-size:13px; color:#9a8568; align-self:flex-end; }
+
+  .controls { display:flex; gap:12px; justify-content:center; align-items:center; flex-wrap:wrap; animation: rise .9s .3s cubic-bezier(.2,.7,.2,1) both; }
+  .btn { font-family: inherit; cursor:pointer; border-radius:100px; font-size:14.5px; font-weight:600; padding:14px 30px; transition: all .22s ease; border:1px solid transparent; }
+  .btn.primary { background: var(--ink); color:#1a1320; }
+  .btn.primary:hover { transform: translateY(-2px); box-shadow:0 12px 26px -12px rgba(236,227,214,0.5); }
+  .btn.ghost { background:transparent; color:var(--muted); border-color:rgba(255,255,255,0.14); }
+  .btn.ghost:hover { color:var(--ink); border-color:rgba(255,255,255,0.3); }
+  .hidden { display:none; }
+
+  .progress { text-align:center; margin-top:18px; font-size:12px; letter-spacing:.04em; color:var(--muted); animation: rise .9s .35s cubic-bezier(.2,.7,.2,1) both; }
+  .finished { font-family:'Fraunces','Iowan Old Style',Palatino,Georgia,serif; font-style:italic; }
+  .rules { margin: clamp(30px,6vw,48px) auto 0; text-align:center; max-width:40ch; font-size:12.5px; line-height:1.7; color:var(--muted); border-top:1px solid rgba(255,255,255,0.07); padding-top:22px; animation: rise .9s .45s cubic-bezier(.2,.7,.2,1) both; }
+  .rules b { color:rgba(236,227,214,0.8); font-weight:600; }
+
+  @keyframes rise { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
+  @keyframes breathe { 0%,100%{ transform:scale(1); opacity:.9; } 50%{ transform:scale(1.06); opacity:1; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <div class="eyebrow">A Conversation Deck for Two</div>
+      <h1 class="title">Between <em>Us</em></h1>
+    </header>
+
+    <div class="themes" id="themes"></div>
+
+    <div class="stage">
+      <div class="card" id="card">
+        <div class="face back">
+          <div class="frame"></div>
+          <div class="ring"><span class="glyph">&amp;</span></div>
+          <div class="name">Between Us</div>
+        </div>
+        <div class="face front">
+          <div class="frame" id="frontFrame"></div>
+          <div class="meta"><span class="dot" id="dot"></span><span class="theme-label" id="themeLabel"></span></div>
+          <div class="q" id="question"></div>
+          <div class="num" id="num"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn primary" id="drawBtn">Draw a card</button>
+      <button class="btn primary hidden" id="nextBtn">Next card</button>
+      <button class="btn ghost hidden" id="shuffleBtn">Shuffle</button>
+    </div>
+
+    <div class="progress" id="progress"></div>
+
+    <div class="rules">
+      <b>How to play, loosely:</b> Take turns drawing. Whoever draws answers first, then the other. Let answers breathe — silence is allowed. You don't have to fix anything the other says. You can always pass, but notice what you wanted to pass on.
+    </div>
+  </div>
+
+<script>
+  const THEMES = [
+    { key:"friendship", label:"Between the Two of Us", accent:"#c98a3c", cards:[
+      "When did you realize we'd be friends for a long time?",
+      "What's the first thing you remember about meeting me?",
+      "What's something nice you think about me but have never told me?",
+      "Is there something about me that I can't see, but you can?",
+      "What do you miss about how our friendship used to be, if anything?",
+      "When have you felt close to me without us even talking?",
+      "Have I ever changed your mind about something that mattered? When?",
+      "What's a happy memory of us you think about when you're feeling low?",
+      "Is there something on your mind you've wanted to tell me but haven't?",
+      "When have I let you down, and how did you get past it?",
+      "What do you think I worry about that I shouldn't?",
+      "What do you get from our friendship that you don't get anywhere else?",
+      "How would you describe our friendship to someone who's never met us?",
+      "What's something we've never done together that you'd love to do?",
+      "What makes you trust me?",
+      "Is there anything you wish I asked you about more often?",
+      "Where do you hope the two of us will be in twenty years?",
+      "What's something I do that you secretly wish you did more of?" ] },
+    { key:"inner", label:"The Inner World", accent:"#5f9a92", cards:[
+      "Is there something you used to believe about yourself that you now doubt?",
+      "When do you feel most like yourself?",
+      "What's a feeling you have a lot but rarely talk about?",
+      "On a bad day, what does the voice in your head tell you?",
+      "What's something you pretend not to care about, but do?",
+      "Is there a part of who you are now that didn't come naturally at first?",
+      "What's something you've been wondering about yourself lately?",
+      "What do you need more of right now that you haven't asked for?",
+      "What usually cheers you up when nothing else works?",
+      "What's something small that instantly puts you in a bad mood?",
+      "Are there two sides of you that don't quite fit together?",
+      "When you go quiet, what's usually going on inside?",
+      "What do you do when you're stressed that you wouldn't admit to most people?",
+      "What makes you feel proud of yourself?",
+      "What's a part of your day you look forward to most?",
+      "What's something about you that people only notice once they know you well?",
+      "What do you wish more people understood about you?",
+      "When did you last surprise yourself?" ] },
+    { key:"thennow", label:"Then & Now", accent:"#b9758a", cards:[
+      "If your sixteen-year-old self met you today, what would they think?",
+      "What were you like as a kid?",
+      "Is there a completely different life you almost ended up living?",
+      "What's a small moment from childhood that has stuck with you?",
+      "What did you badly want back then that you don't want anymore?",
+      "Whose approval have you spent a lot of your life wanting?",
+      "Who believed in you when you needed it most?",
+      "What's the best decision you ever made?",
+      "What's something that ended that you're now glad about?",
+      "What's something you used to be scared of that doesn't bother you now?",
+      "What's a moment when your life clearly changed direction?",
+      "What hard time would you go back and help your younger self through?",
+      "What's something you'd do differently if you could go back?",
+      "Who from your past do you still think about?",
+      "What's something you used to be embarrassed about that you'd laugh at now?",
+      "What's a dream you've had since you were young that you still hold onto?",
+      "What's something you've finally forgiven yourself for?" ] },
+    { key:"dreams", label:"Dreams & What-Ifs", accent:"#cc9a4e", cards:[
+      "If you couldn't fail and no one would judge you, what would you do?",
+      "What does a perfect ordinary day look like for you in the future?",
+      "Where in the world would you most like to live for a while?",
+      "What's a totally different life you're curious about, but wouldn't really want?",
+      "What would you most like to be remembered for?",
+      "If money wasn't an issue, how would your life change?",
+      "If you could only achieve one of your goals, which would you choose?",
+      "Is there something you want to create or build in your lifetime?",
+      "What's something you'd love to be really good at?",
+      "What would success actually look like for you?",
+      "When do you feel most like the person you want to be?",
+      "What's a small dream you could actually start working toward this year?",
+      "If you could have dinner with anyone, living or dead, who would it be?",
+      "If you had a secret year nobody would ever know about, how would you spend it?",
+      "What's an adventure you really want to have someday?",
+      "What do you hope your life looks like in ten years?",
+      "If you could leave one message for the people who come after you, what would it be?" ] },
+    { key:"deep", label:"The Deep End", accent:"#9c6b8f", cards:[
+      "What's something you're a little afraid is true about you?",
+      "When did you last feel like someone really understood you?",
+      "What's been the hardest year of your life so far?",
+      "Is there a loss you're still sad about but haven't really talked about?",
+      "What do you do with feelings you think you shouldn't have?",
+      "When have you felt lonely even with people around you?",
+      "When did you last cry, and what was it about?",
+      "What would you need to hear to feel less alone right now?",
+      "What's a fear you don't usually admit to?",
+      "What part of yourself are you still learning to love?",
+      "What do you need most from the people who love you?",
+      "What's something hard that someone told you that ended up helping you?",
+      "What's something you're still carrying that you wish you could put down?",
+      "When do you feel the most insecure?",
+      "What are you most afraid people will find out about you?",
+      "What helps you most when you're going through something hard?",
+      "Is there a hurt of yours that you worry affects the people close to you?" ] },
+    { key:"growth", label:"Becoming", accent:"#7f9b6a", cards:[
+      "Who are you slowly becoming these days?",
+      "What's a way of thinking you're trying to change?",
+      "Who taught you how to be the kind of person you want to be?",
+      "What's something you've gotten better at in the last few years?",
+      "What's something you used to judge that you now understand?",
+      "What's the bravest small thing you've done lately?",
+      "What habit would you most like to build?",
+      "What advice do you give that you don't follow yourself?",
+      "What's something you've changed your mind about recently?",
+      "What would be different if you trusted yourself more?",
+      "Who do you want to become more like?",
+      "What's a boundary you've set that you're proud of?",
+      "What's a mistake that actually taught you something important?",
+      "What are you growing out of right now?",
+      "What's one thing you'd like to be less afraid of?",
+      "What are you working on about yourself right now?",
+      "What does really taking care of yourself look like for you?" ] },
+    { key:"r21", label:"After Dark", accent:"#b04a5e", cards:[
+      "What do you actually want in bed that you've never asked someone for?",
+      "What turns you on that others might judge you for?",
+      "Have you ever thought about someone else while you were in bed with another?",
+      "What's the wildest sexual experience you've ever had",
+      "If you had to break up with someone, what would you wish they would do to help with the process?",
+      "One free pass, anyone in the world: do you take it, and who?",
+      "What's something you've been too shy to bring up that you want to try?",
+      "What's the most reckless thing you've ever done out of desire?",
+      "How has being with me changed what intimacy means to you?",
+      "What helps you feel safe enough to be completely open with me?",
+    ] }
+  ];
+
+  const shuffle = (a) => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+  function buildQueue(key){
+    let pool;
+    if(key==="all"){ pool = THEMES.flatMap(t=>t.cards.map(text=>({text,theme:t.label,accent:t.accent}))); }
+    else { const t=THEMES.find(x=>x.key===key); pool=t.cards.map(text=>({text,theme:t.label,accent:t.accent})); }
+    return shuffle(pool);
+  }
+
+  let activeTheme="all", queue=buildQueue("all"), pos=0, card=null, finished=false;
+
+  const els = {
+    themes:document.getElementById("themes"), card:document.getElementById("card"),
+    dot:document.getElementById("dot"), themeLabel:document.getElementById("themeLabel"),
+    question:document.getElementById("question"), num:document.getElementById("num"),
+    frontFrame:document.getElementById("frontFrame"), progress:document.getElementById("progress"),
+    drawBtn:document.getElementById("drawBtn"), nextBtn:document.getElementById("nextBtn"),
+    shuffleBtn:document.getElementById("shuffleBtn")
+  };
+
+  function total(){ return activeTheme==="all" ? THEMES.reduce((n,t)=>n+t.cards.length,0) : THEMES.find(t=>t.key===activeTheme).cards.length; }
+
+  function renderThemes(){
+    els.themes.innerHTML="";
+    const all=document.createElement("button");
+    all.className="chip"+(activeTheme==="all"?" on":""); all.textContent="The Whole Deck";
+    all.onclick=()=>selectTheme("all"); els.themes.appendChild(all);
+    THEMES.forEach(t=>{
+      const b=document.createElement("button");
+      b.className="chip"+(activeTheme===t.key?" on":""); b.textContent=t.label;
+      b.onclick=()=>selectTheme(t.key); els.themes.appendChild(b);
+    });
+  }
+
+  function reset(key){ queue=buildQueue(key); pos=0; card=null; finished=false; els.card.classList.remove("show"); renderControls(); renderProgress(); }
+  function selectTheme(key){ if(key===activeTheme) return; activeTheme=key; renderThemes(); reset(key); }
+
+  function paint(){
+    if(!card) return;
+    els.dot.style.background=card.accent;
+    els.frontFrame.style.borderColor=card.accent+"55";
+    els.themeLabel.textContent=card.theme;
+    els.question.textContent=card.text;
+    els.num.textContent=pos+" / "+total();
+  }
+
+  function draw(){
+    if(pos>=queue.length){ finished=true; renderControls(); renderProgress(); return; }
+    card=queue[pos]; pos++; finished=false; paint();
+    els.card.classList.add("show"); renderControls(); renderProgress();
+  }
+  function next(){
+    els.card.classList.remove("show");
+    setTimeout(()=>{
+      if(pos>=queue.length){ finished=true; card=null; renderControls(); renderProgress(); return; }
+      card=queue[pos]; pos++; paint(); els.card.classList.add("show"); renderProgress();
+    },360);
+  }
+
+  function renderControls(){
+    els.drawBtn.classList.toggle("hidden", !!card || finished);
+    els.nextBtn.classList.toggle("hidden", !card);
+    els.shuffleBtn.classList.toggle("hidden", !card);
+    if(finished){ els.drawBtn.classList.remove("hidden"); els.drawBtn.textContent="Shuffle & begin again"; els.drawBtn.onclick=()=>{reset(activeTheme);}; }
+    else { els.drawBtn.textContent="Draw a card"; els.drawBtn.onclick=draw; }
+  }
+  function renderProgress(){
+    if(finished){ els.progress.innerHTML='<span class="finished">You\u2019ve been through the whole deck together. That\u2019s no small thing.</span>'; }
+    else if(card){ const left=total()-pos; els.progress.textContent=left+" card"+(left===1?"":"s")+" left in this set"; }
+    else { els.progress.textContent=total()+" cards in this set"; }
+  }
+
+  els.nextBtn.onclick=next;
+  els.shuffleBtn.onclick=()=>reset(activeTheme);
+  renderThemes(); renderControls(); renderProgress();
+</script>
+</body>
+</html>
