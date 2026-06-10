@@ -1,2 +1,5 @@
 # between_us
-a HTML file
+
+https://alroychiang.github.io/between_us/
+
+A conversation deck for two introspective people :)
